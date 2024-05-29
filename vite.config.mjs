@@ -1,12 +1,13 @@
-import { defineConfig, loadEnv } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'node:path'
-import autoprefixer from 'autoprefixer'
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'node:path';
+import autoprefixer from 'autoprefixer';
+import rewriteAll from 'vite-plugin-rewrite-all';
 
 export default defineConfig(({ mode }) => {
   // Load .env
-  const env = loadEnv(mode, process.cwd(), '')
-  process.env = { ...process.env, ...env }
+  const env = loadEnv(mode, process.cwd(), '');
+  process.env = { ...process.env, ...env };
 
   return {
     base: './',
@@ -37,7 +38,7 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-    plugins: [react()],
+    plugins: [react(), rewriteAll()],
     resolve: {
       alias: [
         {
@@ -53,5 +54,5 @@ export default defineConfig(({ mode }) => {
         // https://vitejs.dev/config/server-options.html
       },
     },
-  }
-})
+  };
+});

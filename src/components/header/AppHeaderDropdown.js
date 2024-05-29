@@ -1,5 +1,5 @@
 import React from 'react'
-import {
+/*import {
   CAvatar,
   CBadge,
   CDropdown,
@@ -23,9 +23,13 @@ import {
 import CIcon from '@coreui/icons-react'
 
 import avatar8 from './../../assets/images/avatars/8.jpg'
-
+*/
 const AppHeaderDropdown = () => {
-  return (
+  
+  
+  
+  
+  /*return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
         <CAvatar src={avatar8} size="md" />
@@ -81,6 +85,7 @@ const AppHeaderDropdown = () => {
           Projects
           <CBadge color="primary" className="ms-2">
             42
+            samiiiiiiiiiiiiiira
           </CBadge>
         </CDropdownItem>
         <CDropdownDivider />
@@ -90,7 +95,7 @@ const AppHeaderDropdown = () => {
         </CDropdownItem>
       </CDropdownMenu>
     </CDropdown>
-  )
+  )*/
 }
 
 export default AppHeaderDropdown

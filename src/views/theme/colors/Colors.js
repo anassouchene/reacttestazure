@@ -1,91 +1,88 @@
-import React, { useEffect, useState, createRef } from 'react'
-import PropTypes from 'prop-types'
-import classNames from 'classnames'
-import { CRow, CCol, CCard, CCardHeader, CCardBody } from '@coreui/react'
-import { rgbToHex } from '@coreui/utils'
-import { DocsLink } from 'src/components'
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
+import './imeuble.css';
+import { BASE_URL } from '../../../config';
 
-const ThemeView = () => {
-  const [color, setColor] = useState('rgb(255, 255, 255)')
-  const ref = createRef()
+const Immeuble = () => {
+  const [immeubles, setImmeubles] = useState([]);
 
   useEffect(() => {
-    const el = ref.current.parentNode.firstChild
-    const varColor = window.getComputedStyle(el).getPropertyValue('background-color')
-    setColor(varColor)
-  }, [ref])
+    const fetchImmeubles = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}Immeubles`, {
+          headers: {
+            accept: 'text/plain',
+            'Authorization': `Bearer ${localStorage.token}`
+          }
+        });
+        setImmeubles(response.data.$values);
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error fetching the immeubles data:', error);
+      }
+    };
+
+    fetchImmeubles();
+  }, []);
+
+  const getCoordsForEtage = (index) => {
+    const totalHeight = 433;
+    const firstEtageHeight = totalHeight * 0.35; // 35% of the total height
+    const otherEtagesHeight = (totalHeight * 0.65) / 3; // Remaining 65% divided by 3
+
+    if (index === 0) {
+      // First floor
+      const top = totalHeight - firstEtageHeight;
+      return `0,${top},577,433`;
+    } else {
+      // Other floors
+      const top = totalHeight - firstEtageHeight - (index * otherEtagesHeight);
+      const bottom = top + otherEtagesHeight;
+      return `0,${top},577,${bottom}`;
+    }
+  };
 
   return (
-    <table className="table w-100" ref={ref}>
-      <tbody>
-        <tr>
-          <td className="text-body-secondary">HEX:</td>
-          <td className="font-weight-bold">{rgbToHex(color)}</td>
-        </tr>
-        <tr>
-          <td className="text-body-secondary">RGB:</td>
-          <td className="font-weight-bold">{color}</td>
-        </tr>
-      </tbody>
-    </table>
-  )
-}
+    <div>
+      {immeubles.map((immeuble) => (
+        <div className="immeuble-container" key={immeuble.id}>
+          <div className="left-section">
+            <h1 className="liste-titre">{`Immeuble ${immeuble.id}`}</h1>
+            <div className="immeuble-info">
+              <p>{`Nombre d'étages: ${immeuble.nbrEtages}`}</p>
+              <p>{`Nombre total d'appartements: ${immeuble.nbrAppartements}`}</p>
+            </div>
+          </div>
+          <div className="right-section">
+            <img
+              className="immeubleDivise"
+              src={`imeuble.png`}
+              alt={`immeuble`}
+              useMap={`#etagesMap${immeuble.id}`}
+              width="577"
+              height="433"
+            />
+            <map name={`etagesMap${immeuble.id}`}>
+              {immeuble.etages && immeuble.etages.$values.map((etage, index) => (
+                <Link
+                  key={etage.id}
+                  to={`/etage/${etage.id}`} // Redirect to /etage/:id
+                >
+                  <area
+                    shape="rect"
+                    coords={getCoordsForEtage(index)} // Use the calculated coordinates
+                    alt={`Etage ${index + 1}`}
+                    title={`Étage ${index + 1}`} // Add title for accessibility
+                  />
+                </Link>
+              ))}
+            </map>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
-const ThemeColor = ({ className, children }) => {
-  const classes = classNames(className, 'theme-color w-75 rounded mb-3')
-  return (
-    <CCol xs={12} sm={6} md={4} xl={2} className="mb-4">
-      <div className={classes} style={{ paddingTop: '75%' }}></div>
-      {children}
-      <ThemeView />
-    </CCol>
-  )
-}
-
-ThemeColor.propTypes = {
-  children: PropTypes.node,
-  className: PropTypes.string,
-}
-
-const Colors = () => {
-  return (
-    <>
-      <CCard className="mb-4">
-        <CCardHeader>
-          Theme colors
-          <DocsLink href="https://coreui.io/docs/utilities/colors/" />
-        </CCardHeader>
-        <CCardBody>
-          <CRow>
-            <ThemeColor className="bg-primary">
-              <h6>Brand Primary Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-secondary">
-              <h6>Brand Secondary Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-success">
-              <h6>Brand Success Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-danger">
-              <h6>Brand Danger Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-warning">
-              <h6>Brand Warning Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-info">
-              <h6>Brand Info Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-light">
-              <h6>Brand Light Color</h6>
-            </ThemeColor>
-            <ThemeColor className="bg-dark">
-              <h6>Brand Dark Color</h6>
-            </ThemeColor>
-          </CRow>
-        </CCardBody>
-      </CCard>
-    </>
-  )
-}
-
-export default Colors
+export default Immeuble;
